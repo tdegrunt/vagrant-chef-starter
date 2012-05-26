@@ -17,14 +17,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+	
+apt_repository 'redis-server' do
+  uri 'http://ppa.launchpad.net/chris-lea/redis-server/ubuntu'
+  distribution node['lsb']['codename']
+  components ['main']
+  keyserver 'keyserver.ubuntu.com'
+  key 'C7917B12'
+  action :add
+end
 
 package "redis-server"
 
 service "redis-server" do
   start_command "/etc/init.d/redis-server start #{node['redis']['config_path']}"
   stop_command "/etc/init.d/redis-server stop"
-  restart_command "/etc/init.d/redis-server restart"
-  action :enable
+  restart_command "/etc/init.d/redis-server restart"  
+  reload_command '/etc/init.d/redis-server force-reload'
+  supports :reload => true, :restart => true, :status => true
+  action :enable  
 end
 
 template "/etc/redis/redis.conf" do
